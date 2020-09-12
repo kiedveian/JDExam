@@ -1,5 +1,6 @@
 # JDExam
 
-how to test 
-run "go fops.go"
+
+how to test <p>
+run "go fops.go" <p>
 
