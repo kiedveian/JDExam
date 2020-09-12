@@ -1,4 +1,4 @@
-package main
+package fops
 
 import(
     "fmt"
@@ -7,28 +7,29 @@ import(
     "bytes"
 )
 
-func fops(args []string){
-//    fmt.Printf("len=%d cap=%d %v\n", len(args), cap(args), args)
+func Run(args []string){
     if len(args)>=1{
-        switch cmd := args[0]; cmd{
+        remain := args[1:]
+        switch cmd := args[0];  cmd{
         case "help":
-            cmdhelp(args)
+            CmdHelp(remain)
         case "linecount":
-            fmt.Println(cmdlinecount(args))
+            fmt.Println(CmdLineCount(remain))
         default:
             fmt.Println("undefined command ", cmd)
         }
     }
 }
 
-func cmdhelp(args []string){
+func CmdHelp(args []string){
     fmt.Println("test help command")
+    fmt.Println("args: " ,args)
 }
 
-func cmdlinecount(args []string)string{
-    switch args[1]{
+func CmdLineCount(args []string)string{
+    switch args[0]{
     case "-f", "--file":
-        file, err := os.Open(args[2])
+        file, err := os.Open(args[1])
         if err != nil{
             return fmt.Sprint(err)
         }
@@ -57,16 +58,4 @@ func linecount(flie io.Reader)(int, error){
             return result, err
         }
     }
-}
-
-func testCommand(args []string){
-    fmt.Println("run commands: ",args)
-    fops(args)
-}
-
-
-func main(){
-    testCommand([]string{"help"})
-    testCommand([]string{"linecount", "-f", "myfile.txt"})
-    testCommand([]string{"linecount", "-f", "no_find_file"})
 }
