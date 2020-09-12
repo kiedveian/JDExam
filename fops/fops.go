@@ -26,22 +26,20 @@ func cmdhelp(args []string){
 }
 
 func cmdlinecount(args []string)string{
-    // TODO error handle
-    var file *os.File
     switch args[1]{
-    case "-f":
-        f, err := os.Open(args[2])
-        _ = err
-        file = f
-    case "--file":
-        f, err := os.Open(args[2])
-        file = f
-        _ = err
+    case "-f", "--file":
+        file, err := os.Open(args[2])
+        if err != nil{
+            return fmt.Sprint(err)
+        }
+        count, err := linecount(file)
+        if err != nil{
+            return fmt.Sprint(err)
+        }
+        return fmt.Sprint(count)
+    default:
+        return "undefined error"
     }
-    count, error := linecount(file)
-    _ = error
-    return fmt.Sprint(count)
-//    return "undefined error"
 }
 
 func linecount(flie io.Reader)(int, error){
@@ -61,7 +59,14 @@ func linecount(flie io.Reader)(int, error){
     }
 }
 
+func testCommand(args []string){
+    fmt.Println("run commands: ",args)
+    fops(args)
+}
+
+
 func main(){
-    fops([]string{"help"})
-    fops([]string{"linecount", "-f", "myfile.txt"})
+    testCommand([]string{"help"})
+    testCommand([]string{"linecount", "-f", "myfile.txt"})
+    testCommand([]string{"linecount", "-f", "no_find_file"})
 }
