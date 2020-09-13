@@ -1,4 +1,4 @@
-package fops
+package main
 
 import (
 	"bytes"
@@ -103,4 +103,8 @@ func checksum(flie io.Reader, flag string) ([]byte, error) {
 		return nil, err
 	}
 	return hashObj.Sum(nil), nil
+}
+
+func main(){
+	Run(os.Args[1:])
 }

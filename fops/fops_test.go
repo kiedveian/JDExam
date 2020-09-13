@@ -1,4 +1,4 @@
-package fops_test
+package main_test
 
 import (
 	. "github.com/kiedveian/JDExam/fops"
