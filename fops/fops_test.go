@@ -2,7 +2,7 @@ package fops_test
 
 
 import (
-    . "fops"
+    . "github.com/kiedveian/JDExam/fops"
     "testing"
 )
 
