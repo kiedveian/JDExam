@@ -1,8 +1,0 @@
-Print checksum of file
-Usage:
-  fops checksum [flags]
-Flags:
-  -f, --file   the input file 
-  --md5
-  --sha1
-  --sha256
