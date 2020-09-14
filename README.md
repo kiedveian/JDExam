@@ -19,8 +19,8 @@
 
 * known issues
   * error message inconsistent with example
+  * command "linecount" return a error if input is a binary file
 
 * TODO 
-  * command "linecount" return a error if input is a binary file
-  * unit test
+  * more unit test
   * accurate test cases of error handle
