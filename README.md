@@ -19,7 +19,8 @@
   * error message inconsistent with example
 
 * TODO 
-  * check binary file
-  * make file
+  * command "linecount" return a error if input is a binary file
+  * makefile
   * automatic build
   * unit test
+  * accurate test cases of error handle

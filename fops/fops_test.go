@@ -7,9 +7,11 @@ import (
 
 func TestLineConut(t *testing.T) {
 	testStr := []string{"-f", "testdata/myfile.txt"}
-	result := CmdLineCount(testStr)
-	if result != "4" {
-		t.Errorf("input: %s , result: %s , expected: %s ", testStr, result, "4")
+	result, err := CmdLineCount(testStr)
+	if err != nil {
+		t.Errorf(err.Error())
+	} else if result != 4 {
+		t.Errorf("input: %s , result: %d , expected: %d ", testStr, result, 4)
 	}
 }
 
@@ -24,8 +26,20 @@ func TestCheckSum(t *testing.T) {
 
 func testCheckSumImp(t *testing.T, flag, ans string) {
 	testStr := []string{"-f", "testdata/myfile.txt", flag}
-	result := CmdCheckSum(testStr)
-	if result != ans {
+	result, err := CmdCheckSum(testStr)
+	if err != nil {
+		t.Errorf(err.Error())
+	} else if result != ans {
 		t.Errorf("input: %s \n result: \n %s \n expected: \n %s ", testStr, result, ans)
+	}
+}
+
+func TestError(t *testing.T) {
+	filename := "non-exist-file.ttt"
+	if _, err := CmdLineCount([]string{"-f", filename}); err == nil {
+		t.Errorf("cmd: linecout -f %s, result: <nil>, expected a error ", filename)
+	}
+	if _, err := CmdCheckSum([]string{"-f", filename, "--md5"}); err == nil {
+		t.Errorf("cmd: checksum -f %s --md5, result: <nil>, expected a error ", filename)
 	}
 }

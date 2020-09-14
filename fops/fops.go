@@ -6,6 +6,7 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"hash"
 	"io"
@@ -60,7 +61,12 @@ func Run(args []string) {
 		case "-h", "help":
 			CmdHelp(remain)
 		case "linecount":
-			fmt.Println(CmdLineCount(remain))
+			count, err := CmdLineCount(remain)
+			if err != nil {
+				fmt.Println(err)
+			} else {
+				fmt.Println(count)
+			}
 		case "checksum":
 			fmt.Println(CmdCheckSum(remain))
 		case "version":
@@ -90,44 +96,45 @@ func CmdHelp(args []string) {
 	}
 }
 
-func CmdLineCount(args []string) string {
+func CmdLineCount(args []string) (int, error) {
 	if len(args) < 2 {
-		return "error: args not enough"
+		return 0, errors.New("args not enough")
 	}
 	switch args[0] {
 	case "-f", "--file":
 		file, err := os.Open(args[1])
 		if err != nil {
-			return fmt.Sprint(err)
+			return 0, err
 		}
+		defer file.Close()
 		count, err := linecountBySep(file)
 		if err != nil {
-			return fmt.Sprint(err)
+			return 0, err
 		}
-		return fmt.Sprint(count)
+		return count, nil
 	default:
-		return "error: undefined flag " + args[0]
+		return 0, errors.New("undefined flag " + args[0])
 	}
 }
 
-func CmdCheckSum(args []string) string {
+func CmdCheckSum(args []string) (string, error) {
 	if len(args) < 3 {
-		return "error: args not enough"
+		return "", errors.New("args not enough")
 	}
 	switch args[0] {
 	case "-f", "--file":
 		file, err := os.Open(args[1])
 		if err != nil {
-			return fmt.Sprint(err)
+			return "", err
 		}
 		defer file.Close()
 		byteArr, err := checksum(file, args[2])
 		if err != nil {
-			return fmt.Sprint(err)
+			return "", err
 		}
-		return hex.EncodeToString(byteArr)
+		return hex.EncodeToString(byteArr), nil
 	default:
-		return "error: undefined flag " + args[0]
+		return "", errors.New("undefined flag " + args[0])
 	}
 }
 
