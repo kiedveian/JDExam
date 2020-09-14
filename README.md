@@ -20,7 +20,5 @@
 
 * TODO 
   * command "linecount" return a error if input is a binary file
-  * makefile
-  * automatic build
   * unit test
   * accurate test cases of error handle
