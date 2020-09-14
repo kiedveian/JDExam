@@ -1,0 +1,5 @@
+Print line count of file
+Usage:
+  fops linecount [flags]
+Flags:
+  -f, --file   the input file

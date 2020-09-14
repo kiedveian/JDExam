@@ -16,6 +16,39 @@ const (
 	bufferSize = 32 * 1024
 )
 
+const (
+	helpString = `File Ops
+Usage:
+  fops [flags]
+  fops [command]
+Available Commands:
+  linecount    Print line count of file
+  checksum     Print checksum of file
+  version      Show the version info
+  help         Help about commands
+Flags:
+  -h, --help   help for fops`
+)
+
+const (
+	linecountString = `Print line count of file
+Usage:
+  fops linecount [flags]
+Flags:
+  -f, --file   the input file`
+)
+
+const (
+	checksumString = `Print checksum of file
+Usage:
+  fops checksum [flags]
+Flags:
+  -f, --file   the input file 
+  --md5
+  --sha1
+  --sha256`
+)
+
 func Run(args []string) {
 	if len(args) >= 1 {
 		remain := args[1:]
@@ -33,8 +66,20 @@ func Run(args []string) {
 }
 
 func CmdHelp(args []string) {
-	fmt.Println("test help command")
-	fmt.Println("args: ", args)
+	command := "help"
+	if len(args) >= 1{
+		command = args[0]
+	}
+	switch command{
+	case "help":
+		fmt.Println(helpString)
+	case "linecount":
+		fmt.Println(linecountString)
+	case "checksum":
+		fmt.Println(checksumString)
+	default:
+		fmt.Println(helpString)
+	}
 }
 
 func CmdLineCount(args []string) string {
