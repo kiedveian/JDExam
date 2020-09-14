@@ -1,7 +1,9 @@
 # File Ops
 
 * how to build 
-   <pre>run "go build -o fops github.com/kiedveian/JDExam/fops" </pre>
+  * run commands:
+  <pre> go get github.com/kiedveian/JDExam/fops 
+   go build -o fops github.com/kiedveian/JDExam/fops </pre>
 
 * Usage:
   *  fops [flags]
