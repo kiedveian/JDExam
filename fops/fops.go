@@ -17,6 +17,10 @@ const (
 )
 
 const (
+	versionString = "v0.0.1"
+)
+
+const (
 	helpString = `File Ops
 Usage:
   fops [flags]
@@ -53,24 +57,28 @@ func Run(args []string) {
 	if len(args) >= 1 {
 		remain := args[1:]
 		switch cmd := args[0]; cmd {
-		case "help":
+		case "-h", "help":
 			CmdHelp(remain)
 		case "linecount":
 			fmt.Println(CmdLineCount(remain))
 		case "checksum":
 			fmt.Println(CmdCheckSum(remain))
+		case "version":
+			fmt.Println("fops " + versionString)
 		default:
-			fmt.Println("undefined command ", cmd)
+			fmt.Println("error: undefined command ", cmd)
 		}
+	} else {
+		fmt.Println("error: no find command ")
 	}
 }
 
 func CmdHelp(args []string) {
 	command := "help"
-	if len(args) >= 1{
+	if len(args) >= 1 {
 		command = args[0]
 	}
-	switch command{
+	switch command {
 	case "help":
 		fmt.Println(helpString)
 	case "linecount":
@@ -83,23 +91,29 @@ func CmdHelp(args []string) {
 }
 
 func CmdLineCount(args []string) string {
+	if len(args) < 2 {
+		return "error: args not enough"
+	}
 	switch args[0] {
 	case "-f", "--file":
 		file, err := os.Open(args[1])
 		if err != nil {
 			return fmt.Sprint(err)
 		}
-		count, err := linecount(file)
+		count, err := linecountBySep(file)
 		if err != nil {
 			return fmt.Sprint(err)
 		}
 		return fmt.Sprint(count)
 	default:
-		return "undefined error"
+		return "error: undefined flag " + args[0]
 	}
 }
 
 func CmdCheckSum(args []string) string {
+	if len(args) < 3 {
+		return "error: args not enough"
+	}
 	switch args[0] {
 	case "-f", "--file":
 		file, err := os.Open(args[1])
@@ -113,17 +127,17 @@ func CmdCheckSum(args []string) string {
 		}
 		return hex.EncodeToString(byteArr)
 	default:
-		return "undefined error"
+		return "error: undefined flag " + args[0]
 	}
 }
 
-func linecount(flie io.Reader) (int, error) {
+func linecountBySep(file io.Reader) (int, error) {
 	buf := make([]byte, bufferSize)
 	result := 0
 	lineSep := []byte{'\n'}
 
 	for {
-		count, err := flie.Read(buf)
+		count, err := file.Read(buf)
 		result += bytes.Count(buf[:count], lineSep)
 		switch {
 		case err == io.EOF:
@@ -134,7 +148,7 @@ func linecount(flie io.Reader) (int, error) {
 	}
 }
 
-func checksum(flie io.Reader, flag string) ([]byte, error) {
+func checksum(file io.Reader, flag string) ([]byte, error) {
 	var hashObj hash.Hash
 	switch flag {
 	case "--md5":
@@ -144,12 +158,12 @@ func checksum(flie io.Reader, flag string) ([]byte, error) {
 	case "--sha256":
 		hashObj = sha256.New()
 	}
-	if _, err := io.Copy(hashObj, flie); err != nil {
+	if _, err := io.Copy(hashObj, file); err != nil {
 		return nil, err
 	}
 	return hashObj.Sum(nil), nil
 }
 
-func main(){
+func main() {
 	Run(os.Args[1:])
 }
