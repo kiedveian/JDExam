@@ -13,8 +13,22 @@ import (
 	"os"
 )
 
+type ErrorType uint
+
+type FopsError struct {
+	TypeId ErrorType
+	Err    error
+}
+
 const (
 	bufferSize = 32 * 1024
+)
+
+const (
+	ErrUndefined ErrorType = iota
+	ErrStd
+	ErrArgsNotEnough
+	ErrUndefinedFlag
 )
 
 const (
@@ -53,6 +67,20 @@ Flags:
   --sha1
   --sha256`
 )
+
+func CreateStdErr(err error) *FopsError {
+	result := new(FopsError)
+	result.TypeId = ErrStd
+	result.Err = err
+	return result
+}
+
+func CreateFopsErr(typeId ErrorType, message string) *FopsError {
+	result := new(FopsError)
+	result.TypeId = typeId
+	result.Err = errors.New(message)
+	return result
+}
 
 func Run(args []string) {
 	if len(args) >= 1 {
@@ -96,49 +124,49 @@ func CmdHelp(args []string) {
 	}
 }
 
-func CmdLineCount(args []string) (int, error) {
+func CmdLineCount(args []string) (int, *FopsError) {
 	if len(args) < 2 {
-		return 0, errors.New("args not enough")
+		return 0, CreateFopsErr(ErrArgsNotEnough, "args not enough")
 	}
 	switch args[0] {
 	case "-f", "--file":
 		file, err := os.Open(args[1])
 		if err != nil {
-			return 0, err
+			return 0, CreateStdErr(err)
 		}
 		defer file.Close()
-		count, err := linecountBySep(file)
-		if err != nil {
-			return 0, err
+		count, fopsError := linecountBySep(file)
+		if fopsError != nil {
+			return 0, fopsError
 		}
 		return count, nil
 	default:
-		return 0, errors.New("undefined flag " + args[0])
+		return 0, CreateFopsErr(ErrUndefinedFlag, "undefined flag "+args[0])
 	}
 }
 
-func CmdCheckSum(args []string) (string, error) {
+func CmdCheckSum(args []string) (string, *FopsError) {
 	if len(args) < 3 {
-		return "", errors.New("args not enough")
+		return "", CreateFopsErr(ErrArgsNotEnough, "args not enough")
 	}
 	switch args[0] {
 	case "-f", "--file":
 		file, err := os.Open(args[1])
 		if err != nil {
-			return "", err
+			return "", CreateStdErr(err)
 		}
 		defer file.Close()
-		byteArr, err := checksum(file, args[2])
-		if err != nil {
-			return "", err
+		byteArr, fopsError := checksum(file, args[2])
+		if fopsError != nil {
+			return "", fopsError
 		}
 		return hex.EncodeToString(byteArr), nil
 	default:
-		return "", errors.New("undefined flag " + args[0])
+		return "", CreateFopsErr(ErrUndefinedFlag, "undefined flag "+args[0])
 	}
 }
 
-func linecountBySep(file io.Reader) (int, error) {
+func linecountBySep(file io.Reader) (int, *FopsError) {
 	buf := make([]byte, bufferSize)
 	result := 0
 	lineSep := []byte{'\n'}
@@ -150,12 +178,12 @@ func linecountBySep(file io.Reader) (int, error) {
 		case err == io.EOF:
 			return result, nil
 		case err != nil:
-			return result, err
+			return result, CreateStdErr(err)
 		}
 	}
 }
 
-func checksum(file io.Reader, flag string) ([]byte, error) {
+func checksum(file io.Reader, flag string) ([]byte, *FopsError) {
 	var hashObj hash.Hash
 	switch flag {
 	case "--md5":
@@ -166,7 +194,7 @@ func checksum(file io.Reader, flag string) ([]byte, error) {
 		hashObj = sha256.New()
 	}
 	if _, err := io.Copy(hashObj, file); err != nil {
-		return nil, err
+		return nil, CreateStdErr(err)
 	}
 	return hashObj.Sum(nil), nil
 }

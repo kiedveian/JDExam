@@ -1,16 +1,18 @@
 package main_test
 
 import (
+	"fmt"
 	. "github.com/kiedveian/JDExam/fops"
+	"os"
 	"runtime"
 	"testing"
 )
 
 func TestLineConut(t *testing.T) {
 	testStr := []string{"-f", "testdata/myfile.txt"}
-	result, err := CmdLineCount(testStr)
-	if err != nil {
-		t.Errorf(err.Error())
+	result, fopsErr := CmdLineCount(testStr)
+	if fopsErr != nil {
+		t.Errorf(fopsErr.Err.Error())
 	} else if result != 4 {
 		t.Errorf("input: %s , result: %d , expected: %d ", testStr, result, 4)
 	}
@@ -45,20 +47,27 @@ func testLinuxCheckSum(t *testing.T) {
 
 func testCheckSumImp(t *testing.T, flag, ans string) {
 	testStr := []string{"-f", "testdata/myfile.txt", flag}
-	result, err := CmdCheckSum(testStr)
-	if err != nil {
-		t.Errorf(err.Error())
+	result, fopsErr := CmdCheckSum(testStr)
+	if fopsErr != nil {
+		t.Errorf(fopsErr.Err.Error())
 	} else if result != ans {
 		t.Errorf("input: %s \n result: \n %s \n expected: \n %s ", testStr, result, ans)
 	}
 }
 
-func TestError(t *testing.T) {
+func TestNotExistError(t *testing.T) {
 	filename := "non-exist-file.ttt"
-	if _, err := CmdLineCount([]string{"-f", filename}); err == nil {
-		t.Errorf("cmd: linecout -f %s, result: <nil>, expected a error ", filename)
-	}
-	if _, err := CmdCheckSum([]string{"-f", filename, "--md5"}); err == nil {
-		t.Errorf("cmd: checksum -f %s --md5, result: <nil>, expected a error ", filename)
+	_, fopsErr := CmdLineCount([]string{"-f", filename})
+	checkNotExistErr(t, fopsErr, fmt.Sprintf("linecout -f %s", filename))
+
+	_, fopsErr = CmdCheckSum([]string{"-f", filename, "--md5"})
+	checkNotExistErr(t, fopsErr, fmt.Sprintf("checksum -f %s --md5", filename))
+}
+
+func checkNotExistErr(t *testing.T, fopsErr *FopsError, command string) {
+	if fopsErr == nil {
+		t.Errorf("cmd: %s, result: <nil>, expected a error ", command)
+	} else if !os.IsNotExist(fopsErr.Err) {
+		t.Errorf("cmd: %s, result: %s, expected error: the file is not exist ", command, fopsErr.Err)
 	}
 }
