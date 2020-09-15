@@ -91,12 +91,17 @@ func Run(args []string) {
 		case "linecount":
 			count, err := CmdLineCount(remain)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println(err.Err.Error())
 			} else {
 				fmt.Println(count)
 			}
 		case "checksum":
-			fmt.Println(CmdCheckSum(remain))
+			str, err := CmdCheckSum(remain)
+			if err != nil {
+				fmt.Println(err.Err.Error())
+			} else {
+				fmt.Println(str)
+			}
 		case "version":
 			fmt.Println("fops " + versionString)
 		default:
