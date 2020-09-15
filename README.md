@@ -19,7 +19,7 @@
 
 * known issues
   * error message inconsistent with example
-  * command "linecount" return a error if input is a binary file
+  * cannot detected binary file
 
 * TODO 
   * more unit test
