@@ -10,7 +10,9 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"net/http"
 	"os"
+	"strings"
 )
 
 type ErrorType uint
@@ -30,6 +32,7 @@ const (
 	ErrArgsNotEnough
 	ErrUndefinedFlag
 	ErrIsDir
+	ErrNotText
 )
 
 const (
@@ -142,7 +145,7 @@ func CmdLineCount(args []string) (int, *FopsError) {
 	}
 	switch args[0] {
 	case "-f", "--file":
-		file, fopsError := CheckOpenFile(args[1])
+		file, fopsError := CheckOpenFile(args[1], nil)
 		if fopsError != nil {
 			return 0, fopsError
 		}
@@ -163,7 +166,7 @@ func CmdCheckSum(args []string) (string, *FopsError) {
 	}
 	switch args[0] {
 	case "-f", "--file":
-		file, fopsError := CheckOpenFile(args[1])
+		file, fopsError := CheckOpenFile(args[1], map[ErrorType]bool{ErrNotText: true})
 		if fopsError != nil {
 			return "", fopsError
 		}
@@ -178,7 +181,28 @@ func CmdCheckSum(args []string) (string, *FopsError) {
 	}
 }
 
-func CheckOpenFile(filename string) (*os.File, *FopsError) {
+func getFileContentType(file *os.File) (string, *FopsError) {
+	buffer := make([]byte, 512)
+	pos, err := file.Seek(0, 1)
+	if err != nil {
+		return "", CreateStdErr(err)
+	}
+	_, err = file.Read(buffer)
+	if err != nil && err != io.EOF {
+		return "", CreateStdErr(err)
+	}
+	_, err = file.Seek(pos, 0)
+	if err != nil {
+		return "", CreateStdErr(err)
+	}
+	contentType := http.DetectContentType(buffer)
+	return contentType, nil
+}
+
+func CheckOpenFile(filename string, skipError map[ErrorType]bool) (*os.File, *FopsError) {
+	if skipError == nil {
+		skipError = map[ErrorType]bool{}
+	}
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, CreateStdErr(err)
@@ -187,9 +211,17 @@ func CheckOpenFile(filename string) (*os.File, *FopsError) {
 	if err != nil {
 		return nil, CreateStdErr(err)
 	}
-	if info.IsDir() {
+	if !skipError[ErrIsDir] && info.IsDir() {
 		defer file.Close()
 		return nil, CreateFopsErr(ErrIsDir, "Expected file got directory '"+filename+"'")
+	}
+	fileType, fopsError := getFileContentType(file)
+	if fopsError != nil {
+		defer file.Close()
+		return nil, fopsError
+	}
+	if !skipError[ErrNotText] && !strings.Contains(fileType, "text") {
+		return nil, CreateFopsErr(ErrNotText, "Cannot do linecount (detect content type: "+fileType+")")
 	}
 	return file, nil
 }

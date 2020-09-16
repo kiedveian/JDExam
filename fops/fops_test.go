@@ -9,7 +9,7 @@ import (
 )
 
 func TestLineConut(t *testing.T) {
-	testStr := []string{"-f", "testdata/myfile.txt"}
+	testStr := []string{"-f", "testdata/utf8.txt"}
 	result, fopsErr := CmdLineCount(testStr)
 	if fopsErr != nil {
 		t.Errorf(fopsErr.Err.Error())
