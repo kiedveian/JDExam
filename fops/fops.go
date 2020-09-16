@@ -29,6 +29,7 @@ const (
 	ErrStd
 	ErrArgsNotEnough
 	ErrUndefinedFlag
+	ErrIsDir
 )
 
 const (
@@ -135,9 +136,9 @@ func CmdLineCount(args []string) (int, *FopsError) {
 	}
 	switch args[0] {
 	case "-f", "--file":
-		file, err := os.Open(args[1])
-		if err != nil {
-			return 0, CreateStdErr(err)
+		file, fopsError := CheckOpenFile(args[1])
+		if fopsError != nil {
+			return 0, fopsError
 		}
 		defer file.Close()
 		count, fopsError := linecountBySep(file)
@@ -156,9 +157,9 @@ func CmdCheckSum(args []string) (string, *FopsError) {
 	}
 	switch args[0] {
 	case "-f", "--file":
-		file, err := os.Open(args[1])
-		if err != nil {
-			return "", CreateStdErr(err)
+		file, fopsError := CheckOpenFile(args[1])
+		if fopsError != nil {
+			return "", fopsError
 		}
 		defer file.Close()
 		byteArr, fopsError := checksum(file, args[2])
@@ -169,6 +170,22 @@ func CmdCheckSum(args []string) (string, *FopsError) {
 	default:
 		return "", CreateFopsErr(ErrUndefinedFlag, "undefined flag "+args[0])
 	}
+}
+
+func CheckOpenFile(filename string) (*os.File, *FopsError) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, CreateStdErr(err)
+	}
+	info, err := file.Stat()
+	if err != nil {
+		return nil, CreateStdErr(err)
+	}
+	if info.IsDir() {
+		defer file.Close()
+		return nil, CreateFopsErr(ErrIsDir, "Expected file got directory '"+filename+"'")
+	}
+	return file, nil
 }
 
 func linecountBySep(file io.Reader) (int, *FopsError) {

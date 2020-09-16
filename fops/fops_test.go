@@ -55,13 +55,23 @@ func testCheckSumImp(t *testing.T, flag, ans string) {
 	}
 }
 
-func TestNotExistError(t *testing.T) {
-	filename := "non-exist-file.ttt"
-	_, fopsErr := CmdLineCount([]string{"-f", filename})
-	checkNotExistErr(t, fopsErr, fmt.Sprintf("linecout -f %s", filename))
+func TestFileError(t *testing.T) {
+	nonExistFilename := "non-exist-file.ttt"
+	directoryFilename := "testdata/"
 
-	_, fopsErr = CmdCheckSum([]string{"-f", filename, "--md5"})
-	checkNotExistErr(t, fopsErr, fmt.Sprintf("checksum -f %s --md5", filename))
+	_, fopsErr := CmdLineCount([]string{"-f", nonExistFilename})
+	checkNotExistErr(t, fopsErr, fmt.Sprintf("linecout -f %s", nonExistFilename))
+
+	_, fopsErr = CmdCheckSum([]string{"-f", nonExistFilename, "--md5"})
+	checkNotExistErr(t, fopsErr, fmt.Sprintf("checksum -f %s --md5", nonExistFilename))
+
+	commandString := fmt.Sprintf("linecout -f %s", directoryFilename)
+	_, fopsErr = CmdLineCount([]string{"-f", directoryFilename})
+	if fopsErr == nil {
+		t.Errorf("cmd: %s, result: <nil>, expected a error ", commandString)
+	} else if fopsErr.TypeId != ErrIsDir {
+		t.Errorf("cmd: %s, result: %s, expected error: Expected file got directory", commandString, fopsErr.Err)
+	}
 }
 
 func checkNotExistErr(t *testing.T, fopsErr *FopsError, command string) {
