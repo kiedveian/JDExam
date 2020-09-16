@@ -33,6 +33,14 @@ const (
 )
 
 const (
+	FlagHelpShot  = "-h"
+	FlagHelpLong  = "--help"
+	FlagLineCount = "linecount"
+	FlagCheckSum  = "checksum"
+	FlagVersion   = "version"
+)
+
+const (
 	versionString = "v0.0.1"
 )
 
@@ -87,23 +95,23 @@ func Run(args []string) {
 	if len(args) >= 1 {
 		remain := args[1:]
 		switch cmd := args[0]; cmd {
-		case "-h", "help":
+		case FlagHelpShot, FlagHelpLong:
 			CmdHelp(remain)
-		case "linecount":
+		case FlagLineCount:
 			count, err := CmdLineCount(remain)
 			if err != nil {
 				fmt.Println(err.Err.Error())
 			} else {
 				fmt.Println(count)
 			}
-		case "checksum":
+		case FlagCheckSum:
 			str, err := CmdCheckSum(remain)
 			if err != nil {
 				fmt.Println(err.Err.Error())
 			} else {
 				fmt.Println(str)
 			}
-		case "version":
+		case FlagVersion:
 			fmt.Println("fops " + versionString)
 		default:
 			fmt.Println("error: undefined command ", cmd)
