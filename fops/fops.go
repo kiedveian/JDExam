@@ -41,10 +41,6 @@ const (
 )
 
 const (
-	versionString = "v0.0.1"
-)
-
-const (
 	helpString = `File Ops
 Usage:
   fops [flags]
@@ -76,6 +72,8 @@ Flags:
   --sha1
   --sha256`
 )
+
+var Version string
 
 func CreateStdErr(err error) *FopsError {
 	result := new(FopsError)
@@ -112,7 +110,7 @@ func Run(args []string) {
 				fmt.Println(str)
 			}
 		case FlagVersion:
-			fmt.Println("fops " + versionString)
+			fmt.Println("fops " + Version)
 		default:
 			fmt.Println("error: undefined command ", cmd)
 		}
