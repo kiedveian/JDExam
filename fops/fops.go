@@ -42,7 +42,7 @@ const (
 	FlagFileLong    = "--file"
 	FlagLineCount   = "linecount"
 	FlagCheckSum    = "checksum"
-	FlagVersionShot = "version"
+	FlagVersionShot = "-v"
 	FlagVersionLong = "version"
 	FlagMd5         = "--md5"
 	FlagSha1        = "--sha1"
