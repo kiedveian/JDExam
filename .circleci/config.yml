@@ -31,10 +31,11 @@ jobs:
       - run: go test github.com/kiedveian/JDExam/fops
       - run: go build -o bin/fops -ldflags "-X main.Version=v0.0.1" github.com/kiedveian/JDExam/fops
 
-      - save_cache:
-          key: fops_bin_cache
+      - persist_to_workspace:
+          root: bin
           paths:
-            - bin/fops
+            - fops
+
   test:
     docker:
       # specify the version
@@ -43,9 +44,8 @@ jobs:
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
 
     steps:
-      - restore_cache:
-          keys:
-            - fops_bin_cache
+      - attach_workspace:
+            at: bin
 
       - run: mkdir -p $TEST_RESULTS # create the test results directory
       - run: bin/fops -h
