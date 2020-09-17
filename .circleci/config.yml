@@ -66,11 +66,12 @@ jobs:
     steps:
       - attach_workspace:
           at: bin
+      - run: bin/fops version
+      - run: VERSION=$(bin/fops version)
       - run:
           name: "Publish Release on GitHub"
           command: |
             go get github.com/tcnksm/ghr
-            VERSION=$(bin/fops version)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./bin/
 
 workflows:
