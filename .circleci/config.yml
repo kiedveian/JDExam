@@ -31,22 +31,26 @@ jobs:
       - run: go test github.com/kiedveian/JDExam/fops
       - run: go build -o bin/fops -ldflags "-X main.Version=v0.0.1" github.com/kiedveian/JDExam/fops
 
-#  test:
-#    docker:
+-     - save_cache:
+          paths:
+            - bin
+  test:
+    docker:
       # specify the version
-#      - image: circleci/golang:1.9
+      - image: circleci/golang:1.9
 
-#    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     
 
-#    steps:
+    steps:
       - run: mkdir -p $TEST_RESULTS # create the test results directory
       - run: bin/fops -h
       - run: bin/fops -h > $TEST_RESULTS/help.txt
       - run: bin/fops version
       - run: bin/fops version > $TEST_RESULTS/version.txt
       - store_artifacts:
-          path: /tmp/test-results
+          path: 
+            - /tmp/test-results
 
       - store_test_results: # upload test results for display in Test Summary
           path: /tmp/test-results
