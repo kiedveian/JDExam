@@ -36,16 +36,17 @@ const (
 )
 
 const (
-	FlagHelpShot  = "-h"
-	FlagHelpLong  = "--help"
-	FlagFileShot  = "-f"
-	FlagFileLong  = "--file"
-	FlagLineCount = "linecount"
-	FlagCheckSum  = "checksum"
-	FlagVersion   = "version"
-	FlagMd5       = "--md5"
-	FlagSha1      = "--sha1"
-	FlagSha256    = "--sha256"
+	FlagHelpShot    = "-h"
+	FlagHelpLong    = "--help"
+	FlagFileShot    = "-f"
+	FlagFileLong    = "--file"
+	FlagLineCount   = "linecount"
+	FlagCheckSum    = "checksum"
+	FlagVersionShot = "-v"
+	FlagVersionLong = "version"
+	FlagMd5         = "--md5"
+	FlagSha1        = "--sha1"
+	FlagSha256      = "--sha256"
 )
 
 const (
@@ -117,8 +118,10 @@ func Run(args []string) {
 			} else {
 				fmt.Println(str)
 			}
-		case FlagVersion:
+		case FlagVersionLong:
 			fmt.Println("fops " + Version)
+		case FlagVersionShot:
+			fmt.Println(Version)
 		default:
 			fmt.Println("error: undefined command ", cmd)
 		}
