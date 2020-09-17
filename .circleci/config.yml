@@ -28,8 +28,6 @@ jobs:
       - run: go test github.com/kiedveian/JDExam/fops@${CIRCLE_BRANCH}
       - run: go build -o /tmp/fops/bin/fops -ldflags "-X main.Version=v0.0.1" github.com/kiedveian/JDExam/fops@${CIRCLE_BRANCH}
 
-@<branch>
-
       - persist_to_workspace:
           root: /tmp/fops/bin
           paths:
