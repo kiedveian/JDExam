@@ -32,7 +32,7 @@ jobs:
       - run: go build -o bin/fops -ldflags "-X main.Version=v0.0.1" github.com/kiedveian/JDExam/fops
 
       - save_cache:
-          key: *fops_bin_key
+          key: fops_bin_cache
           paths:
             - bin/fops
   test:
@@ -45,7 +45,7 @@ jobs:
     steps:
       - restore_cache:
           keys:
-            - *fops_bin_key
+            - fops_bin_cache
 
       - run: mkdir -p $TEST_RESULTS # create the test results directory
       - run: bin/fops -h
