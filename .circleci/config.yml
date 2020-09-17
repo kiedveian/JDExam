@@ -58,11 +58,34 @@ jobs:
       - store_test_results: # upload test results for display in Test Summary
           path: /tmp/test-results
 
+  publish-github-release:
+    docker:
+      - image: circleci/golang:1.9
+    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+    environment: # environment variables for the build itself
+      GITHUB_TOKEN: 123
+      CIRCLE_PROJECT_USERNAME: kiedveian
+      CIRCLE_PROJECT_REPONAME: JDExam
+      CIRCLE_SHA1: 123
+
+    steps:
+      - attach_workspace:
+          at: bin
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            go get github.com/tcnksm/ghr
+            VERSION=bin/fops
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./bin/
+
 workflows:
   version: 2
   build_and_test:
     jobs:
       - build
       - test:
+          requires:
+            - build
+      - publish-github-release:
           requires:
             - build
