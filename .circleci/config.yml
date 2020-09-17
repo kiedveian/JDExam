@@ -50,6 +50,7 @@ jobs:
       - run: mkdir -p $TEST_RESULTS # create the test results directory
       - run: bin/fops -h
       - run: bin/fops -h > $TEST_RESULTS/help.txt
+      - run: bin/fops -v
       - run: bin/fops version
       - run: bin/fops version > $TEST_RESULTS/version.txt
       - store_artifacts:
