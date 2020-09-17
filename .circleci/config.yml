@@ -24,13 +24,12 @@ jobs:
       # specify any bash command here prefixed with `run: `
       # - run: go get -v -t -d ./...
       # - run: go test -v ./...
-      - run: rm bin/fops
       - run: go get github.com/kiedveian/JDExam/fops
       - run: go test github.com/kiedveian/JDExam/fops
-      - run: go build -o bin/fops -ldflags "-X main.Version=v0.0.1" github.com/kiedveian/JDExam/fops
+      - run: go build -o /tmp/fops/bin/fops -ldflags "-X main.Version=v0.0.1" github.com/kiedveian/JDExam/fops
 
       - persist_to_workspace:
-          root: bin
+          root: /tmp/fops/bin
           paths:
             - fops
 
@@ -46,14 +45,14 @@ jobs:
 
     steps:
       - attach_workspace:
-            at: bin
+            at: /tmp/fops/bin
 
       - run: mkdir -p $TEST_RESULTS # create the test results directory
-      - run: bin/fops -h
-      - run: bin/fops -h > $TEST_RESULTS/help.txt
-      - run: bin/fops -v
-      - run: bin/fops version
-      - run: bin/fops version > $TEST_RESULTS/version.txt
+      - run: /tmp/fops/bin/fops -h
+      - run: /tmp/fops/bin/fops -h > $TEST_RESULTS/help.txt
+      - run: /tmp/fops/bin/fops -v
+      - run: /tmp/fops/bin/fops version
+      - run: /tmp/fops/bin/fops version > $TEST_RESULTS/version.txt
       - store_artifacts:
           path: /tmp/test-results
 
@@ -67,15 +66,15 @@ jobs:
 
     steps:
       - attach_workspace:
-          at: bin
-      - run: bin/fops -v
+          at: /tmp/fops/bin
+      - run: /tmp/fops/bin/fops -v
       - run:
           name: "Publish Release on GitHub"
           command: |
-            VERSION=$(bin/fops -v)
+            VERSION=$(/tmp/fops/bin/fops -v)
             echo ${VERSION}
             go get github.com/tcnksm/ghr
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./bin/
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} /tmp/fops/bin/
 
 workflows:
   version: 2
