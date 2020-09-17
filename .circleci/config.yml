@@ -24,7 +24,7 @@ jobs:
       # - run: go get -v -t -d ./...
       # - run: go test -v ./...
       - run: go get github.com/kiedveian/JDExam/fops
-      - run: go test github.com/kiedveian/JDExam/fops > $TEST_RESULTS/test_result.txt
+      - run: go test github.com/kiedveian/JDExam/fops
       - run: go build -o bin/fops -ldflags "-X main.Version=v0.0.1" github.com/kiedveian/JDExam/fops
 
   test:
