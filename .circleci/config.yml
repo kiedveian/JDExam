@@ -18,6 +18,10 @@ jobs:
     ####   /go/src/github.com/circleci/go-tool
     ####   /go/src/bitbucket.org/circleci/go-tool
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+
+    environment: # environment variables for the build itself
+      TEST_RESULTS: /tmp/test-results # path to where test results will be saved
+
     steps:
       - checkout
       # specify any bash command here prefixed with `run: `
@@ -27,17 +31,15 @@ jobs:
       - run: go test github.com/kiedveian/JDExam/fops
       - run: go build -o bin/fops -ldflags "-X main.Version=v0.0.1" github.com/kiedveian/JDExam/fops
 
-  test:
-    docker:
+#  test:
+#    docker:
       # specify the version
-      - image: circleci/golang:1.9
+#      - image: circleci/golang:1.9
 
-    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+#    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     
-    environment: # environment variables for the build itself
-      TEST_RESULTS: /tmp/test-results # path to where test results will be saved
 
-    steps:
+#    steps:
       - run: mkdir -p $TEST_RESULTS # create the test results directory
       - run: bin/fops -h
       - run: bin/fops -h > $TEST_RESULTS/help.txt
@@ -54,6 +56,6 @@ workflows:
   build_and_test:
     jobs:
       - build
-      - test:
-          requires:
-            - build
+#      - test:
+#          requires:
+#            - build
