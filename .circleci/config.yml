@@ -13,9 +13,6 @@ jobs:
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/postgres:9.4
 
-    environment: # environment variables for the build itself
-      TEST_RESULTS: /tmp/test-results # path to where test results will be saved
-
     #### TEMPLATE_NOTE: go expects specific checkout path representing url
     #### expecting it in the form of
     ####   /go/src/github.com/circleci/go-tool
@@ -23,8 +20,6 @@ jobs:
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
       - checkout
-      - run: mkdir -p $TEST_RESULTS # create the test results directory
-
       # specify any bash command here prefixed with `run: `
       # - run: go get -v -t -d ./...
       # - run: go test -v ./...
@@ -32,6 +27,19 @@ jobs:
       - run: go test github.com/kiedveian/JDExam/fops > $TEST_RESULTS/test_result.txt
       - run: go build -o bin/fops -ldflags "-X main.Version=v0.0.1" github.com/kiedveian/JDExam/fops
 
+  test:
+    docker:
+      # specify the version
+      - image: circleci/golang:1.9
+
+    environment: # environment variables for the build itself
+      TEST_RESULTS: /tmp/test-results # path to where test results will be saved
+
+    steps:
+      - run: mkdir -p $TEST_RESULTS # create the test results directory
+      - run: fops -h
+      - run: fops -h > $TEST_RESULTS/help.txt
+      - run: fops version
       - run: fops version > $TEST_RESULTS/version.txt
       - store_artifacts:
           path: /tmp/test-results
@@ -39,3 +47,9 @@ jobs:
       - store_test_results: # upload test results for display in Test Summary
           path: /tmp/test-results
 
+workflows:
+  version: 2
+  workflow:
+    jobs:
+    - build
+    - test
