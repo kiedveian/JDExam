@@ -81,7 +81,7 @@ Flags:
   --sha256`
 )
 
-var Version string
+var Version = "No Version Provided"
 
 func CreateStdErr(err error) *FopsError {
 	result := new(FopsError)
