@@ -53,8 +53,7 @@ jobs:
       - run: bin/fops version
       - run: bin/fops version > $TEST_RESULTS/version.txt
       - store_artifacts:
-          path: 
-            - /tmp/test-results
+          path: /tmp/test-results
 
       - store_test_results: # upload test results for display in Test Summary
           path: /tmp/test-results
