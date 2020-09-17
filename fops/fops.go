@@ -38,9 +38,14 @@ const (
 const (
 	FlagHelpShot  = "-h"
 	FlagHelpLong  = "--help"
+	FlagFileShot  = "-f"
+	FlagFileLong  = "--file"
 	FlagLineCount = "linecount"
 	FlagCheckSum  = "checksum"
 	FlagVersion   = "version"
+	FlagMd5       = "--md5"
+	FlagSha1      = "--sha1"
+	FlagSha256    = "--sha256"
 )
 
 const (
@@ -144,7 +149,7 @@ func CmdLineCount(args []string) (int, *FopsError) {
 		return 0, CreateFopsErr(ErrArgsNotEnough, "args not enough")
 	}
 	switch args[0] {
-	case "-f", "--file":
+	case FlagFileShot, FlagFileLong:
 		file, fopsError := CheckOpenFile(args[1], nil)
 		if fopsError != nil {
 			return 0, fopsError
@@ -165,7 +170,7 @@ func CmdCheckSum(args []string) (string, *FopsError) {
 		return "", CreateFopsErr(ErrArgsNotEnough, "args not enough")
 	}
 	switch args[0] {
-	case "-f", "--file":
+	case FlagFileShot, FlagFileLong:
 		file, fopsError := CheckOpenFile(args[1], map[ErrorType]bool{ErrNotText: true})
 		if fopsError != nil {
 			return "", fopsError
@@ -246,11 +251,11 @@ func ImpLineCount(file io.Reader) (int, *FopsError) {
 func ImpCheckSum(file io.Reader, flag string) ([]byte, *FopsError) {
 	var hashObj hash.Hash
 	switch flag {
-	case "--md5":
+	case FlagMd5:
 		hashObj = md5.New()
-	case "--sha1":
+	case FlagSha1:
 		hashObj = sha1.New()
-	case "--sha256":
+	case FlagSha256:
 		hashObj = sha256.New()
 	}
 	if _, err := io.Copy(hashObj, file); err != nil {
