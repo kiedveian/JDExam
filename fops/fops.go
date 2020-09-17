@@ -150,7 +150,7 @@ func CmdLineCount(args []string) (int, *FopsError) {
 			return 0, fopsError
 		}
 		defer file.Close()
-		count, fopsError := linecountBySep(file)
+		count, fopsError := ImpLineCount(file)
 		if fopsError != nil {
 			return 0, fopsError
 		}
@@ -171,7 +171,7 @@ func CmdCheckSum(args []string) (string, *FopsError) {
 			return "", fopsError
 		}
 		defer file.Close()
-		byteArr, fopsError := checksum(file, args[2])
+		byteArr, fopsError := ImpCheckSum(file, args[2])
 		if fopsError != nil {
 			return "", fopsError
 		}
@@ -226,7 +226,7 @@ func CheckOpenFile(filename string, skipError map[ErrorType]bool) (*os.File, *Fo
 	return file, nil
 }
 
-func linecountBySep(file io.Reader) (int, *FopsError) {
+func ImpLineCount(file io.Reader) (int, *FopsError) {
 	buf := make([]byte, bufferSize)
 	result := 0
 	lineSep := []byte{'\n'}
@@ -243,7 +243,7 @@ func linecountBySep(file io.Reader) (int, *FopsError) {
 	}
 }
 
-func checksum(file io.Reader, flag string) ([]byte, *FopsError) {
+func ImpCheckSum(file io.Reader, flag string) ([]byte, *FopsError) {
 	var hashObj hash.Hash
 	switch flag {
 	case "--md5":
