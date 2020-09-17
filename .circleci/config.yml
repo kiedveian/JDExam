@@ -19,9 +19,6 @@ jobs:
     ####   /go/src/bitbucket.org/circleci/go-tool
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
 
-    environment: # environment variables for the build itself
-      TEST_RESULTS: /tmp/test-results # path to where test results will be saved
-
     steps:
       - checkout
       # specify any bash command here prefixed with `run: `
@@ -42,6 +39,9 @@ jobs:
       - image: circleci/golang:1.9
 
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+
+    environment: # environment variables for the build itself
+      TEST_RESULTS: /tmp/test-results # path to where test results will be saved
 
     steps:
       - attach_workspace:
