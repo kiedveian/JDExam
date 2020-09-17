@@ -32,15 +32,17 @@ jobs:
       # specify the version
       - image: circleci/golang:1.9
 
+    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+    
     environment: # environment variables for the build itself
       TEST_RESULTS: /tmp/test-results # path to where test results will be saved
 
     steps:
       - run: mkdir -p $TEST_RESULTS # create the test results directory
-      - run: fops -h
-      - run: fops -h > $TEST_RESULTS/help.txt
-      - run: fops version
-      - run: fops version > $TEST_RESULTS/version.txt
+      - run: bin/fops -h
+      - run: bin/fops -h > $TEST_RESULTS/help.txt
+      - run: bin/fops version
+      - run: bin/fops version > $TEST_RESULTS/version.txt
       - store_artifacts:
           path: /tmp/test-results
 
