@@ -19,7 +19,6 @@
 
 * known issues
   * error message inconsistent with example
-  * cannot detected binary file
 
 * TODO 
   * more unit test
