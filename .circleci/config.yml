@@ -62,11 +62,6 @@ jobs:
     docker:
       - image: circleci/golang:1.9
     working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
-    environment: # environment variables for the build itself
-      GITHUB_TOKEN: 123
-      CIRCLE_PROJECT_USERNAME: kiedveian
-      CIRCLE_PROJECT_REPONAME: JDExam
-      CIRCLE_SHA1: 123
 
     steps:
       - attach_workspace:
