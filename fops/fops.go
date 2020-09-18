@@ -36,17 +36,17 @@ const (
 )
 
 const (
-	FlagHelpShot    = "-h"
-	FlagHelpLong    = "--help"
-	FlagFileShot    = "-f"
-	FlagFileLong    = "--file"
-	FlagLineCount   = "linecount"
-	FlagCheckSum    = "checksum"
-	FlagVersionShot = "-v"
-	FlagVersionLong = "version"
-	FlagMd5         = "--md5"
-	FlagSha1        = "--sha1"
-	FlagSha256      = "--sha256"
+	FlagHelpShort    = "-h"
+	FlagHelpLong     = "--help"
+	FlagFileShort    = "-f"
+	FlagFileLong     = "--file"
+	FlagLineCount    = "linecount"
+	FlagCheckSum     = "checksum"
+	FlagVersionShort = "-v"
+	FlagVersionLong  = "version"
+	FlagMd5          = "--md5"
+	FlagSha1         = "--sha1"
+	FlagSha256       = "--sha256"
 )
 
 const (
@@ -102,7 +102,7 @@ func Run(args []string) {
 	if len(args) >= 1 {
 		remain := args[1:]
 		switch cmd := args[0]; cmd {
-		case FlagHelpShot, FlagHelpLong:
+		case FlagHelpShort, FlagHelpLong:
 			CmdHelp(remain)
 		case FlagLineCount:
 			count, err := CmdLineCount(remain)
@@ -120,7 +120,7 @@ func Run(args []string) {
 			}
 		case FlagVersionLong:
 			fmt.Println("fops " + Version)
-		case FlagVersionShot:
+		case FlagVersionShort:
 			fmt.Println(Version)
 		default:
 			fmt.Println("error: undefined command ", cmd)
@@ -152,7 +152,7 @@ func CmdLineCount(args []string) (int, *FopsError) {
 		return 0, CreateFopsErr(ErrArgsNotEnough, "args not enough")
 	}
 	switch args[0] {
-	case FlagFileShot, FlagFileLong:
+	case FlagFileShort, FlagFileLong:
 		file, fopsError := CheckOpenFile(args[1], nil)
 		if fopsError != nil {
 			return 0, fopsError
@@ -173,7 +173,7 @@ func CmdCheckSum(args []string) (string, *FopsError) {
 		return "", CreateFopsErr(ErrArgsNotEnough, "args not enough")
 	}
 	switch args[0] {
-	case FlagFileShot, FlagFileLong:
+	case FlagFileShort, FlagFileLong:
 		file, fopsError := CheckOpenFile(args[1], map[ErrorType]bool{ErrNotText: true})
 		if fopsError != nil {
 			return "", fopsError
