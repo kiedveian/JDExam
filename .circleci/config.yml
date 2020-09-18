@@ -24,9 +24,7 @@ jobs:
       # specify any bash command here prefixed with `run: `
       # - run: go get -v -t -d ./...
       # - run: go test -v ./...
-      - run: go get github.com/kiedveian/JDExam/fops
-      - run: go test github.com/kiedveian/JDExam/fops
-      - run: go build -o bin/fops -ldflags "-X main.Version=v0.0.1" github.com/kiedveian/JDExam/fops
+      - run: make all
 
       - persist_to_workspace:
           root: bin
