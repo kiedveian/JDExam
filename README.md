@@ -3,7 +3,7 @@
 * how to build 
   * run commands:
   <pre> go get github.com/kiedveian/JDExam/fops 
-   go build -o fops github.com/kiedveian/JDExam/fops </pre>
+   go build -ldflags "-X main.Version=v0.0.1" -o fops github.com/kiedveian/JDExam/fops </pre>
 
 * Usage:
   *  fops [flags]
@@ -18,8 +18,5 @@
   * -h, --help   help for fops
 
 * known issues
-  * error message inconsistent with example
+  * linecount windows text(no header) file will return error 
 
-* TODO 
-  * more unit test
-  * accurate test cases of error handle
