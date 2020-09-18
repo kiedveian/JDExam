@@ -15,7 +15,7 @@ LDFLAGS=-ldflags "-X main.Version=$(VERSION)"
 
 all: deps test build
 build:
-		$(GOBUILD) -ldflags $(LDFLAGS) -o $(BINARY_PATH) -v $(FULL_GITHUB_REPO_PATH)
+		$(GOBUILD) $(LDFLAGS) -o $(BINARY_PATH) -v $(FULL_GITHUB_REPO_PATH)
 test:
 		$(GOTEST) -v $(FULL_GITHUB_REPO_PATH)
 clean:
