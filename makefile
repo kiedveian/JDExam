@@ -14,13 +14,13 @@ VERSION=v0.0.1
 
 all: test build
 build:
-        $(GOBUILD) -ldflags "-X main.Version=$(VERSION)" -o $(BINARY_PATH) -v $(FULL_GITHUB_REPO_PATH)
+		$(GOBUILD) -ldflags "-X main.Version=$(VERSION)" -o $(BINARY_PATH) -v $(FULL_GITHUB_REPO_PATH)
 test:
-        $(GOTEST) -v $(FULL_GITHUB_REPO_PATH)
+		$(GOTEST) -v $(FULL_GITHUB_REPO_PATH)
 clean:
-        $(GOCLEAN)
-        rm -f $(BINARY_PATH)
+		$(GOCLEAN)
+		rm -f $(BINARY_PATH)
 run:
-        ./$(BINARY_NAME)
+		./$(BINARY_NAME)
 deps:
-        $(GOGET) $(FULL_GITHUB_REPO_PATH)
+		$(GOGET) $(FULL_GITHUB_REPO_PATH)
