@@ -38,48 +38,34 @@ func TestLineConut(t *testing.T) {
 }
 
 func TestCheckSum(t *testing.T) {
+	var fileAns map[string]string
 	switch runtime.GOOS {
 	case "windows":
-		testWindowsCheckSum(t)
+		fileAns = map[string]string{
+			"--md5":    "021ca43b2982439db3ab764527abcd28",
+			"--sha1":   "fda7c974cd9425e8ec3841125c7b8af9f5577c28",
+			"--sha256": "0e401f46bc43161f9e5a7a2ce9e15a2511d972320dadbef20fa2fec6610f04d0"}
 	default:
-		testLinuxCheckSum(t)
+		fileAns = map[string]string{
+			"--md5":    "a8c5d553ed101646036a811772ffbdd8",
+			"--sha1":   "a656582ca3143a5f48718f4a15e7df018d286521",
+			"--sha256": "495a3496cfd90e68a53b5e3ff4f9833b431fe996298f5a28228240ee2a25c09d"}
+	}
+	for flag, ans := range fileAns {
+		testCmdCheckSum(t, flag, "testdata/myfile.txt", ans)
+	}
+
+	stringAns := map[string]string{
+		"--md5":    "ec0f72e148fa0845cf63bbe75207fc46",
+		"--sha1":   "6fc58d78ef4495ff9caf8c3ef91caf7119f655b2",
+		"--sha256": "4ebd184271058535645c8e5c962ba63c89b734eab6cceb81dabc9a0127dbda37"}
+	for flag, ans := range stringAns {
+		testStringCheckSum(t, flag, testCaseString, ans)
 	}
 }
 
-func testWindowsCheckSum(t *testing.T) {
-	md5MyfileAns := "021ca43b2982439db3ab764527abcd28"
-	sha1MyFileAns := "fda7c974cd9425e8ec3841125c7b8af9f5577c28"
-	sha256MyFileAns := "0e401f46bc43161f9e5a7a2ce9e15a2511d972320dadbef20fa2fec6610f04d0"
-	testCmdCheckSum(t, "--md5", md5MyfileAns)
-	testCmdCheckSum(t, "--sha1", sha1MyFileAns)
-	testCmdCheckSum(t, "--sha256", sha256MyFileAns)
-
-	md5StringAns := "ec0f72e148fa0845cf63bbe75207fc46"
-	sha1StringAns := "6fc58d78ef4495ff9caf8c3ef91caf7119f655b2"
-	sha256StringAns := "4ebd184271058535645c8e5c962ba63c89b734eab6cceb81dabc9a0127dbda37"
-	testStringCheckSum(t, "--md5", testCaseString, md5StringAns)
-	testStringCheckSum(t, "--sha1", testCaseString, sha1StringAns)
-	testStringCheckSum(t, "--sha256", testCaseString, sha256StringAns)
-}
-
-func testLinuxCheckSum(t *testing.T) {
-	md5Ans := "a8c5d553ed101646036a811772ffbdd8"
-	sha1Ans := "a656582ca3143a5f48718f4a15e7df018d286521"
-	sha256Ans := "495a3496cfd90e68a53b5e3ff4f9833b431fe996298f5a28228240ee2a25c09d"
-	testCmdCheckSum(t, "--md5", md5Ans)
-	testCmdCheckSum(t, "--sha1", sha1Ans)
-	testCmdCheckSum(t, "--sha256", sha256Ans)
-
-	md5StringAns := "ec0f72e148fa0845cf63bbe75207fc46"
-	sha1StringAns := "6fc58d78ef4495ff9caf8c3ef91caf7119f655b2"
-	sha256StringAns := "4ebd184271058535645c8e5c962ba63c89b734eab6cceb81dabc9a0127dbda37"
-	testStringCheckSum(t, "--md5", testCaseString, md5StringAns)
-	testStringCheckSum(t, "--sha1", testCaseString, sha1StringAns)
-	testStringCheckSum(t, "--sha256", testCaseString, sha256StringAns)
-}
-
-func testCmdCheckSum(t *testing.T, flag, ans string) {
-	testStr := []string{"-f", "testdata/myfile.txt", flag}
+func testCmdCheckSum(t *testing.T, flag, filename, ans string) {
+	testStr := []string{"-f", filename, flag}
 	result, fopsErr := CmdCheckSum(testStr)
 	if fopsErr != nil {
 		t.Errorf(fopsErr.Err.Error())
