@@ -11,7 +11,7 @@ REPO_PATH=kiedveian/JDExam/fops
 FULL_GITHUB_REPO_PATH=github.com/$(REPO_PATH)
 
 VERSION=v0.0.1
-LDFLAGS=-ldflags "-X=main.Version=$(VERSION)"
+LDFLAGS=-ldflags "-X main.Version=$(VERSION)"
 
 all: deps test build
 build:
