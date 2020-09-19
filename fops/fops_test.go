@@ -22,7 +22,7 @@ five
 
 func TestLineConut(t *testing.T) {
 	testStr := []string{"-f", "testdata/utf8.txt"}
-	result, fopsErr := CmdLineCount(testStr)
+	result, fopsErr := RunLineCount(testStr)
 	if fopsErr != nil {
 		t.Errorf(fopsErr.Err.Error())
 	} else if result != 4 {
@@ -66,7 +66,7 @@ func TestCheckSum(t *testing.T) {
 
 func testCmdCheckSum(t *testing.T, flag, filename, ans string) {
 	testStr := []string{"-f", filename, flag}
-	result, fopsErr := CmdCheckSum(testStr)
+	result, fopsErr := RunCheckSum(testStr)
 	if fopsErr != nil {
 		t.Errorf(fopsErr.Err.Error())
 	} else if result != ans {
@@ -88,14 +88,14 @@ func TestFileError(t *testing.T) {
 	nonExistFilename := "non-exist-file.ttt"
 	directoryFilename := "testdata/"
 
-	_, fopsErr := CmdLineCount([]string{"-f", nonExistFilename})
+	_, fopsErr := RunLineCount([]string{"-f", nonExistFilename})
 	checkNotExistErr(t, fopsErr, fmt.Sprintf("linecout -f %s", nonExistFilename))
 
-	_, fopsErr = CmdCheckSum([]string{"-f", nonExistFilename, "--md5"})
+	_, fopsErr = RunCheckSum([]string{"-f", nonExistFilename, "--md5"})
 	checkNotExistErr(t, fopsErr, fmt.Sprintf("checksum -f %s --md5", nonExistFilename))
 
 	commandString := fmt.Sprintf("linecout -f %s", directoryFilename)
-	_, fopsErr = CmdLineCount([]string{"-f", directoryFilename})
+	_, fopsErr = RunLineCount([]string{"-f", directoryFilename})
 	if fopsErr == nil {
 		t.Errorf("cmd: %s, result: <nil>, expected a error ", commandString)
 	} else if fopsErr.TypeId != ErrIsDir {

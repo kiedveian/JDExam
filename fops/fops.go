@@ -36,17 +36,21 @@ const (
 )
 
 const (
-	FlagHelpShort    = "-h"
-	FlagHelpLong     = "--help"
-	FlagFileShort    = "-f"
-	FlagFileLong     = "--file"
-	FlagLineCount    = "linecount"
-	FlagCheckSum     = "checksum"
-	FlagVersionShort = "-v"
-	FlagVersionLong  = "version"
-	FlagMd5          = "--md5"
-	FlagSha1         = "--sha1"
-	FlagSha256       = "--sha256"
+	FlagHelpShort = "-h"
+	FlagHelpLong  = "--help"
+	FlagFileShort = "-f"
+	FlagFileLong  = "--file"
+	FlagVersion   = "-v"
+	FlagMd5       = "--md5"
+	FlagSha1      = "--sha1"
+	FlagSha256    = "--sha256"
+)
+
+const (
+	CmdHelp      = "help"
+	CmdLineCount = "linecount"
+	CmdVersion   = "version"
+	CmdCheckSum  = "checksum"
 )
 
 const (
@@ -60,7 +64,8 @@ Available Commands:
   version      Show the version info
   help         Help about commands
 Flags:
-  -h, --help   help for fops`
+  -h, --help   help for fops
+  -v           Show the version tag`
 )
 
 const (
@@ -82,6 +87,18 @@ Flags:
   --sha256`
 )
 
+const versionStringTemplate = "fops %s"
+
+const (
+	// error template strings
+	undefinedCmdErrTemplate  = "error: undefined command '%s'"
+	noFindCmdErrTemplate     = "error: no find command "
+	argNotEnoughTemplate     = "args not enough"
+	undefinedFlagErrTamplate = "undefined flag '%s'"
+	fileIsDirErrTamplate     = "Expected file got directory '%s'"
+	fileTypeErrTamplate      = "Cannot do linecount (detect content type: %s)"
+)
+
 var Version = "No Version Provided"
 
 func CreateStdErr(err error) *FopsError {
@@ -98,58 +115,58 @@ func CreateFopsErr(typeId ErrorType, message string) *FopsError {
 	return result
 }
 
-func Run(args []string) {
+func RunFops(args []string) {
 	if len(args) >= 1 {
 		remain := args[1:]
 		switch cmd := args[0]; cmd {
-		case FlagHelpShort, FlagHelpLong:
-			CmdHelp(remain)
-		case FlagLineCount:
-			count, err := CmdLineCount(remain)
+		case CmdHelp, FlagHelpShort, FlagHelpLong:
+			RunHelp(remain)
+		case CmdLineCount:
+			count, err := RunLineCount(remain)
 			if err != nil {
 				fmt.Println(err.Err.Error())
 			} else {
 				fmt.Println(count)
 			}
-		case FlagCheckSum:
-			str, err := CmdCheckSum(remain)
+		case CmdCheckSum:
+			str, err := RunCheckSum(remain)
 			if err != nil {
 				fmt.Println(err.Err.Error())
 			} else {
 				fmt.Println(str)
 			}
-		case FlagVersionLong:
-			fmt.Println("fops " + Version)
-		case FlagVersionShort:
+		case CmdVersion:
+			fmt.Println(versionStringTemplate, Version)
+		case FlagVersion:
 			fmt.Println(Version)
 		default:
-			fmt.Println("error: undefined command ", cmd)
+			fmt.Println(undefinedCmdErrTemplate, cmd)
 		}
 	} else {
-		fmt.Println("error: no find command ")
+		fmt.Println(noFindCmdErrTemplate)
 	}
 }
 
-func CmdHelp(args []string) {
-	command := "help"
+func RunHelp(args []string) {
+	command := CmdHelp
 	if len(args) >= 1 {
 		command = args[0]
 	}
 	switch command {
-	case "help":
+	case CmdHelp:
 		fmt.Println(helpString)
-	case "linecount":
+	case CmdLineCount:
 		fmt.Println(linecountString)
-	case "checksum":
+	case CmdCheckSum:
 		fmt.Println(checksumString)
 	default:
 		fmt.Println(helpString)
 	}
 }
 
-func CmdLineCount(args []string) (int, *FopsError) {
+func RunLineCount(args []string) (int, *FopsError) {
 	if len(args) < 2 {
-		return 0, CreateFopsErr(ErrArgsNotEnough, "args not enough")
+		return 0, CreateFopsErr(ErrArgsNotEnough, argNotEnoughTemplate)
 	}
 	switch args[0] {
 	case FlagFileShort, FlagFileLong:
@@ -164,13 +181,14 @@ func CmdLineCount(args []string) (int, *FopsError) {
 		}
 		return count, nil
 	default:
-		return 0, CreateFopsErr(ErrUndefinedFlag, "undefined flag "+args[0])
+		errStr := fmt.Sprint(undefinedFlagErrTamplate, args[0])
+		return 0, CreateFopsErr(ErrUndefinedFlag, errStr)
 	}
 }
 
-func CmdCheckSum(args []string) (string, *FopsError) {
+func RunCheckSum(args []string) (string, *FopsError) {
 	if len(args) < 3 {
-		return "", CreateFopsErr(ErrArgsNotEnough, "args not enough")
+		return "", CreateFopsErr(ErrArgsNotEnough, argNotEnoughTemplate)
 	}
 	switch args[0] {
 	case FlagFileShort, FlagFileLong:
@@ -185,7 +203,8 @@ func CmdCheckSum(args []string) (string, *FopsError) {
 		}
 		return hex.EncodeToString(byteArr), nil
 	default:
-		return "", CreateFopsErr(ErrUndefinedFlag, "undefined flag "+args[0])
+		errStr := fmt.Sprint(undefinedFlagErrTamplate, args[0])
+		return "", CreateFopsErr(ErrUndefinedFlag, errStr)
 	}
 }
 
@@ -221,7 +240,8 @@ func CheckOpenFile(filename string, skipError map[ErrorType]bool) (*os.File, *Fo
 	}
 	if !skipError[ErrIsDir] && info.IsDir() {
 		defer file.Close()
-		return nil, CreateFopsErr(ErrIsDir, "Expected file got directory '"+filename+"'")
+		errStr := fmt.Sprint(fileIsDirErrTamplate, filename)
+		return nil, CreateFopsErr(ErrIsDir, errStr)
 	}
 	fileType, fopsError := getFileContentType(file)
 	if fopsError != nil {
@@ -229,7 +249,8 @@ func CheckOpenFile(filename string, skipError map[ErrorType]bool) (*os.File, *Fo
 		return nil, fopsError
 	}
 	if !skipError[ErrNotText] && !strings.Contains(fileType, "text") {
-		return nil, CreateFopsErr(ErrNotText, "Cannot do linecount (detect content type: "+fileType+")")
+		errStr := fmt.Sprint(fileTypeErrTamplate, fileType)
+		return nil, CreateFopsErr(ErrNotText, errStr)
 	}
 	return file, nil
 }
@@ -268,5 +289,5 @@ func ImpCheckSum(file io.Reader, flag string) ([]byte, *FopsError) {
 }
 
 func main() {
-	Run(os.Args[1:])
+	RunFops(os.Args[1:])
 }
