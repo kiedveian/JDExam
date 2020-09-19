@@ -69,7 +69,7 @@ Flags:
 )
 
 const (
-	linecountString = `Print line count of file
+	helpLinecountString = `Print line count of file
 Usage:
   fops linecount [flags]
 Flags:
@@ -77,7 +77,7 @@ Flags:
 )
 
 const (
-	checksumString = `Print checksum of file
+	helpChecksumString = `Print checksum of file
 Usage:
   fops checksum [flags]
 Flags:
@@ -156,9 +156,9 @@ func RunHelp(args []string) {
 	case CmdHelp:
 		fmt.Println(helpString)
 	case CmdLineCount:
-		fmt.Println(linecountString)
+		fmt.Println(helpLinecountString)
 	case CmdCheckSum:
-		fmt.Println(checksumString)
+		fmt.Println(helpChecksumString)
 	default:
 		fmt.Println(helpString)
 	}
