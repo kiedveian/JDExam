@@ -136,11 +136,11 @@ func RunFops(args []string) {
 				fmt.Println(str)
 			}
 		case CmdVersion:
-			fmt.Println(versionStringTemplate, Version)
+			fmt.Println(fmt.Sprintf(versionStringTemplate, Version))
 		case FlagVersion:
 			fmt.Println(Version)
 		default:
-			fmt.Println(undefinedCmdErrTemplate, cmd)
+			fmt.Println(fmt.Sprintf(undefinedCmdErrTemplate, cmd))
 		}
 	} else {
 		fmt.Println(noFindCmdErrTemplate)
@@ -181,7 +181,7 @@ func RunLineCount(args []string) (int, *FopsError) {
 		}
 		return count, nil
 	default:
-		errStr := fmt.Sprint(undefinedFlagErrTamplate, args[0])
+		errStr := fmt.Sprintf(undefinedFlagErrTamplate, args[0])
 		return 0, CreateFopsErr(ErrUndefinedFlag, errStr)
 	}
 }
@@ -203,7 +203,7 @@ func RunCheckSum(args []string) (string, *FopsError) {
 		}
 		return hex.EncodeToString(byteArr), nil
 	default:
-		errStr := fmt.Sprint(undefinedFlagErrTamplate, args[0])
+		errStr := fmt.Sprintf(undefinedFlagErrTamplate, args[0])
 		return "", CreateFopsErr(ErrUndefinedFlag, errStr)
 	}
 }
@@ -240,7 +240,7 @@ func CheckOpenFile(filename string, skipError map[ErrorType]bool) (*os.File, *Fo
 	}
 	if !skipError[ErrIsDir] && info.IsDir() {
 		defer file.Close()
-		errStr := fmt.Sprint(fileIsDirErrTamplate, filename)
+		errStr := fmt.Sprintf(fileIsDirErrTamplate, filename)
 		return nil, CreateFopsErr(ErrIsDir, errStr)
 	}
 	fileType, fopsError := getFileContentType(file)
@@ -249,7 +249,7 @@ func CheckOpenFile(filename string, skipError map[ErrorType]bool) (*os.File, *Fo
 		return nil, fopsError
 	}
 	if !skipError[ErrNotText] && !strings.Contains(fileType, "text") {
-		errStr := fmt.Sprint(fileTypeErrTamplate, fileType)
+		errStr := fmt.Sprintf(fileTypeErrTamplate, fileType)
 		return nil, CreateFopsErr(ErrNotText, errStr)
 	}
 	return file, nil
