@@ -1,112 +1,162 @@
 package main_test
 
 import (
-	"encoding/hex"
-	"fmt"
 	. "github.com/kiedveian/JDExam/fops"
-	"os"
 	"runtime"
-	"strings"
 	"testing"
 )
 
-const (
-	testCaseString = ` one
-two
-three
-four
-five 
-`
-	testCaseLineCountAnswer = 5
-)
+type args struct {
+	args []string
+}
 
-func TestLineConut(t *testing.T) {
-	testStr := []string{"-f", "testdata/utf8.txt"}
-	result, fopsErr := RunLineCount(testStr)
-	if fopsErr != nil {
-		t.Errorf(fopsErr.Err.Error())
-	} else if result != 4 {
-		t.Errorf("input: %s , result: %d , expected: %d ", testStr, result, 4)
+type checkSumTestCase struct {
+	name    string
+	args    args
+	want    string
+	wantErr *FopsError
+}
+
+func compareError(lhs, rhs *FopsError) bool {
+	if lhs == nil && rhs == nil {
+		return true
+	} else if lhs == nil {
+		return false
+	} else if rhs == nil {
+		return false
 	}
-	reader := strings.NewReader(testCaseString)
-	result, fopsErr = ImpLineCount(reader)
-	if fopsErr != nil {
-		t.Errorf(fopsErr.Err.Error())
-	} else if result != testCaseLineCountAnswer {
-		t.Errorf("input: %s , result: %d , expected: %d ", testStr, result, testCaseLineCountAnswer)
+	return lhs.TypeId == rhs.TypeId
+}
+
+func TestRunLineConut(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    args
+		want    int
+		wantErr *FopsError
+	}{
+		{
+			"linecout utf8 file",
+			args{[]string{"-f", "testdata/utf8.txt"}},
+			4,
+			nil,
+		},
+		{
+			"no find file error",
+			args{[]string{"-f", "non-exist-file.ttt"}},
+			0,
+			&FopsError{ErrStd, nil},
+		},
+		{
+			"file is directory error",
+			args{[]string{"-f", "testdata/"}},
+			0,
+			&FopsError{ErrIsDir, nil},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := RunLineCount(tt.args.args)
+			if got != tt.want {
+				t.Errorf("RunLineCount() got = %v, want %v", got, tt.want)
+			}
+			if !compareError(err, tt.wantErr) {
+				t.Errorf("RunLineCount() err = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
 	}
 }
 
-func TestCheckSum(t *testing.T) {
-	var fileAns map[string]string
+func TestRunCheckSum(t *testing.T) {
+	var tests []checkSumTestCase
 	switch runtime.GOOS {
 	case "windows":
-		fileAns = map[string]string{
-			"--md5":    "021ca43b2982439db3ab764527abcd28",
-			"--sha1":   "fda7c974cd9425e8ec3841125c7b8af9f5577c28",
-			"--sha256": "0e401f46bc43161f9e5a7a2ce9e15a2511d972320dadbef20fa2fec6610f04d0"}
+		tests = getWindowsCheckSumTests()
 	default:
-		fileAns = map[string]string{
-			"--md5":    "a8c5d553ed101646036a811772ffbdd8",
-			"--sha1":   "a656582ca3143a5f48718f4a15e7df018d286521",
-			"--sha256": "495a3496cfd90e68a53b5e3ff4f9833b431fe996298f5a28228240ee2a25c09d"}
+		tests = getLinuxCheckSumTests()
 	}
-	for flag, ans := range fileAns {
-		testCmdCheckSum(t, flag, "testdata/myfile.txt", ans)
-	}
-
-	stringAns := map[string]string{
-		"--md5":    "ec0f72e148fa0845cf63bbe75207fc46",
-		"--sha1":   "6fc58d78ef4495ff9caf8c3ef91caf7119f655b2",
-		"--sha256": "4ebd184271058535645c8e5c962ba63c89b734eab6cceb81dabc9a0127dbda37"}
-	for flag, ans := range stringAns {
-		testStringCheckSum(t, flag, testCaseString, ans)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := RunCheckSum(tt.args.args)
+			if got != tt.want {
+				t.Errorf("RunCheckSum() got = %v, want %v", got, tt.want)
+			}
+			if !compareError(err, tt.wantErr) {
+				t.Errorf("RunCheckSum() err = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
 	}
 }
 
-func testCmdCheckSum(t *testing.T, flag, filename, ans string) {
-	testStr := []string{"-f", filename, flag}
-	result, fopsErr := RunCheckSum(testStr)
-	if fopsErr != nil {
-		t.Errorf(fopsErr.Err.Error())
-	} else if result != ans {
-		t.Errorf("input: %s \n result: \n %s \n expected: \n %s ", testStr, result, ans)
+func getWindowsCheckSumTests() []checkSumTestCase {
+	tests := []checkSumTestCase{
+		{
+			"Windows md5",
+			args{[]string{"-f", "testdata/myfile.txt", "--md5"}},
+			"021ca43b2982439db3ab764527abcd28",
+			nil,
+		},
+		{
+			"Windows sha1",
+			args{[]string{"-f", "testdata/myfile.txt", "--sha1"}},
+			"fda7c974cd9425e8ec3841125c7b8af9f5577c28",
+			nil,
+		},
+		{
+			"Windows sha256",
+			args{[]string{"-f", "testdata/myfile.txt", "--sha256"}},
+			"0e401f46bc43161f9e5a7a2ce9e15a2511d972320dadbef20fa2fec6610f04d0",
+			nil,
+		},
+		{
+			"no find file error",
+			args{[]string{"-f", "non-exist-file.ttt", "--md5"}},
+			"",
+			&FopsError{ErrStd, nil},
+		},
+		{
+			"file is directory error",
+			args{[]string{"-f", "testdata/", "--md5"}},
+			"",
+			&FopsError{ErrIsDir, nil},
+		},
 	}
+	return tests
 }
 
-func testStringCheckSum(t *testing.T, flag, input, ans string) {
-	reader := strings.NewReader(input)
-	byteArr, fopsErr := ImpCheckSum(reader, flag)
-	if fopsErr != nil {
-		t.Errorf(fopsErr.Err.Error())
-	} else if result := hex.EncodeToString(byteArr); result != ans {
-		t.Errorf("input: %s \n result: \n %s \n expected: \n %s ", input, result, ans)
+func getLinuxCheckSumTests() []checkSumTestCase {
+	tests := []checkSumTestCase{
+		{
+			"Linux md5",
+			args{[]string{"-f", "testdata/myfile.txt", "--md5"}},
+			"a8c5d553ed101646036a811772ffbdd8",
+			nil,
+		},
+		{
+			"Linux sha1",
+			args{[]string{"-f", "testdata/myfile.txt", "--sha1"}},
+			"a656582ca3143a5f48718f4a15e7df018d286521",
+			nil,
+		},
+		{
+			"Linux sha256",
+			args{[]string{"-f", "testdata/myfile.txt", "--sha256"}},
+			"495a3496cfd90e68a53b5e3ff4f9833b431fe996298f5a28228240ee2a25c09d",
+			nil,
+		},
+		{
+			"no find file error",
+			args{[]string{"-f", "non-exist-file.ttt", "--md5"}},
+			"",
+			&FopsError{ErrStd, nil},
+		},
+		{
+			"file is directory error",
+			args{[]string{"-f", "testdata/", "--md5"}},
+			"",
+			&FopsError{ErrIsDir, nil},
+		},
 	}
-}
-
-func TestFileError(t *testing.T) {
-	nonExistFilename := "non-exist-file.ttt"
-	directoryFilename := "testdata/"
-
-	_, fopsErr := RunLineCount([]string{"-f", nonExistFilename})
-	checkNotExistErr(t, fopsErr, fmt.Sprintf("linecout -f %s", nonExistFilename))
-
-	_, fopsErr = RunCheckSum([]string{"-f", nonExistFilename, "--md5"})
-	checkNotExistErr(t, fopsErr, fmt.Sprintf("checksum -f %s --md5", nonExistFilename))
-
-	commandString := fmt.Sprintf("linecout -f %s", directoryFilename)
-	_, fopsErr = RunLineCount([]string{"-f", directoryFilename})
-	if fopsErr == nil {
-		t.Errorf("cmd: %s, result: <nil>, expected a error ", commandString)
-	} else if fopsErr.TypeId != ErrIsDir {
-		t.Errorf("cmd: %s, result: %s, expected error: Expected file got directory", commandString, fopsErr.Err)
-	}
-}
-
-func checkNotExistErr(t *testing.T, fopsErr *FopsError, command string) {
-	if fopsErr == nil {
-		t.Errorf("cmd: %s, result: <nil>, expected a error ", command)
-	} else if !os.IsNotExist(fopsErr.Err) {
-		t.Errorf("cmd: %s, result: %s, expected error: the file is not exist ", command, fopsErr.Err)
-	}
+	return tests
 }
