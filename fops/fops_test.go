@@ -147,7 +147,7 @@ func getLinuxCheckSumTests() []checkSumTestCase {
 		},
 		{
 			"no find file error",
-			args{[]string{"-f", "non-exist-file.ttt" , "--md5"}},
+			args{[]string{"-f", "non-exist-file.ttt", "--md5"}},
 			"",
 			&FopsError{ErrStd, nil},
 		},
