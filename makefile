@@ -7,7 +7,9 @@ GOGET=$(GOCMD) get
 BINARY_NAME=fops
 BINARY_DIR=release
 BINARY_PATH=$(BINARY_DIR)/$(BINARY_NAME)
-REPO_PATH=kiedveian/JDExam/fops
+PROJ_PATH=kiedveian/JDExam/
+REPO_PATH=$(PROJ_PATH)/fops
+FULL_GITHUB_PROJ_PATH=github.com/$(PROJ_PATH)
 FULL_GITHUB_REPO_PATH=github.com/$(REPO_PATH)
 
 VERSION=v0.0.2
@@ -15,7 +17,7 @@ LDFLAGS=-ldflags "-X main.Version=$(VERSION)"
 
 all: deps test build
 build:
-		$(GOBUILD) $(LDFLAGS) -o $(BINARY_PATH) -v $(FULL_GITHUB_REPO_PATH)
+		$(GOBUILD) $(LDFLAGS) -o $(BINARY_PATH) -v $(FULL_GITHUB_PROJ_PATH)
 test:
 		$(GOTEST) -v $(FULL_GITHUB_REPO_PATH)
 clean:
@@ -24,4 +26,4 @@ clean:
 run:
 		./$(BINARY_PATH)
 deps:
-		$(GOGET) $(FULL_GITHUB_REPO_PATH)
+		$(GOGET) $(FULL_GITHUB_PROJ_PATH)
