@@ -1,4 +1,4 @@
-package main
+package fops
 
 import (
 	"bytes"
@@ -6,7 +6,6 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"hash"
 	"io"
@@ -15,24 +14,8 @@ import (
 	"strings"
 )
 
-type ErrorType uint
-
-type FopsError struct {
-	TypeId ErrorType
-	Err    error
-}
-
 const (
 	bufferSize = 32 * 1024
-)
-
-const (
-	ErrUndefined ErrorType = iota
-	ErrStd
-	ErrArgsNotEnough
-	ErrUndefinedFlag
-	ErrIsDir
-	ErrNotText
 )
 
 const (
@@ -100,20 +83,6 @@ const (
 )
 
 var Version = "No Version Provided"
-
-func CreateStdErr(err error) *FopsError {
-	result := new(FopsError)
-	result.TypeId = ErrStd
-	result.Err = err
-	return result
-}
-
-func CreateFopsErr(typeId ErrorType, message string) *FopsError {
-	result := new(FopsError)
-	result.TypeId = typeId
-	result.Err = errors.New(message)
-	return result
-}
 
 func RunFops(args []string) {
 	if len(args) >= 1 {
