@@ -10,7 +10,7 @@ BINARY_PATH=$(BINARY_DIR)/$(BINARY_NAME)
 REPO_PATH=kiedveian/JDExam/fops
 FULL_GITHUB_REPO_PATH=github.com/$(REPO_PATH)
 
-VERSION=v0.0.1
+VERSION=v0.0.2
 LDFLAGS=-ldflags "-X main.Version=$(VERSION)"
 
 all: deps test build
