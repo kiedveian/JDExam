@@ -27,7 +27,7 @@ jobs:
       - run: make all
 
       - persist_to_workspace:
-          root: bin
+          root: release
           paths:
             - fops
 
@@ -43,14 +43,14 @@ jobs:
 
     steps:
       - attach_workspace:
-            at: bin
+            at: release
 
       - run: mkdir -p $TEST_RESULTS # create the test results directory
-      - run: bin/fops -h
-      - run: bin/fops -h > $TEST_RESULTS/help.txt
-      - run: bin/fops -v
-      - run: bin/fops version
-      - run: bin/fops version > $TEST_RESULTS/version.txt
+      - run: release/fops -h
+      - run: release/fops -h > $TEST_RESULTS/help.txt
+      - run: release/fops -v
+      - run: release/fops version
+      - run: release/fops version > $TEST_RESULTS/version.txt
       - store_artifacts:
           path: /tmp/test-results
 
@@ -64,15 +64,15 @@ jobs:
 
     steps:
       - attach_workspace:
-          at: bin
-      - run: bin/fops -v
+          at: release
+      - run: release/fops -v
       - run:
           name: "Publish Release on GitHub"
           command: |
-            VERSION=$(bin/fops -v)
+            VERSION=$(release/fops -v)
             echo ${VERSION}
             go get github.com/tcnksm/ghr
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./bin/
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./release/
 
 workflows:
   version: 2
