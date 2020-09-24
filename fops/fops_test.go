@@ -1,4 +1,4 @@
-package main_test
+package fops_test
 
 import (
 	. "github.com/kiedveian/JDExam/fops"
@@ -15,17 +15,6 @@ type checkSumTestCase struct {
 	args    args
 	want    string
 	wantErr *FopsError
-}
-
-func compareError(lhs, rhs *FopsError) bool {
-	if lhs == nil && rhs == nil {
-		return true
-	} else if lhs == nil {
-		return false
-	} else if rhs == nil {
-		return false
-	}
-	return lhs.TypeId == rhs.TypeId
 }
 
 func TestRunLineConut(t *testing.T) {
@@ -61,7 +50,7 @@ func TestRunLineConut(t *testing.T) {
 			if got != tt.want {
 				t.Errorf("RunLineCount() got = %v, want %v", got, tt.want)
 			}
-			if !compareError(err, tt.wantErr) {
+			if !CompareErrorType(err, tt.wantErr) {
 				t.Errorf("RunLineCount() err = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -82,7 +71,7 @@ func TestRunCheckSum(t *testing.T) {
 			if got != tt.want {
 				t.Errorf("RunCheckSum() got = %v, want %v", got, tt.want)
 			}
-			if !compareError(err, tt.wantErr) {
+			if !CompareErrorType(err, tt.wantErr) {
 				t.Errorf("RunCheckSum() err = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
