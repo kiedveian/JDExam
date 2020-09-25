@@ -12,7 +12,7 @@ REPO_PATH=$(PROJ_PATH)/fops
 FULL_GITHUB_PROJ_PATH=github.com/$(PROJ_PATH)
 FULL_GITHUB_REPO_PATH=github.com/$(REPO_PATH)
 
-VERSION=devlop
+VERSION=develop
 LDFLAGS=-ldflags "-X github.com/kiedveian/JDExam/fops.Version=$(VERSION)"
 
 all: deps test build
